@@ -21,6 +21,7 @@ var userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Account',
       required: true,
+      index:true,
     },
     name: {
       type: String,
@@ -29,6 +30,7 @@ var userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
+      index:true,
     },
     profilePic: {
       type: String,

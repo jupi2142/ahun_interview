@@ -19,6 +19,7 @@ var postSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
+      index:true,
     },
     isLiked: {
       type: Boolean,
@@ -38,11 +39,13 @@ var likeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
+      index:true,
     },
     post: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Post',
+      index:true,
     },
   },
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
