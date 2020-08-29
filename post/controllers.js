@@ -4,7 +4,7 @@ var bucket = require('../bucket');
 
 const FAKE_USER_ID = '5f489535ba19eb2a37965fca';
 
-module.exports.feed = async function(request, response) {
+module.exports.feed = async function(request, response, next) {
   try {
     var filter = /\/mine/.test(request.url) ? {user: FAKE_USER_ID} : {};
     var limit = parseInt(request.query.limit) || 4;
@@ -25,12 +25,11 @@ module.exports.feed = async function(request, response) {
       page,
     });
   } catch (e) {
-    console.error(e);
-    response.status(500).send(e);
+    next(e);
   }
 };
 
-module.exports.create = async function(request, response) {
+module.exports.create = async function(request, response, next) {
   try {
     var user = await User.findById(FAKE_USER_ID);
     var resources = await bucket.upload(request.file.path);
@@ -42,16 +41,15 @@ module.exports.create = async function(request, response) {
     });
     response.status(201).json(post);
   } catch (e) {
-    console.log('e: ', e);
-    response.status(500).send(e);
+    next(e);
   }
 };
 
-module.exports.like = async function(request, response) {
+module.exports.like = async function(request, response, next) {
   try {
     var post = await Post.findById(request.params.id);
-    if(!post){
-      return response.status(404).send("Post not found");
+    if (!post) {
+      return response.status(404).send('Post not found');
     }
     var obj = {post: request.params.id, user: FAKE_USER_ID};
     var like = await Like.updateOne(obj, obj, {
@@ -60,16 +58,15 @@ module.exports.like = async function(request, response) {
     });
     response.send('You have successfully liked this vibe');
   } catch (e) {
-    console.error(e)
-    response.status(500).send(e);
+    next(e);
   }
 };
 
-module.exports.unlike = async function(request, response) {
+module.exports.unlike = async function(request, response, next) {
   try {
     var post = await Post.findById(request.params.id);
-    if(!post){
-      return response.status(404).send("Post not found");
+    if (!post) {
+      return response.status(404).send('Post not found');
     }
     await Like.deleteOne({
       post: request.params.id,
@@ -77,15 +74,15 @@ module.exports.unlike = async function(request, response) {
     });
     response.send('You have successfully unliked this vibe');
   } catch (e) {
-    response.status(500).send(e);
+    next(e)
   }
 };
 
-module.exports.get = async function(request, response) {
+module.exports.get = async function(request, response, next) {
   try {
     var post = await Post.findById(request.params.id).populate('user');
     response.json(post);
   } catch (e) {
-    response.status(500).send(error);
+    next(e);
   }
 };
