@@ -1,4 +1,4 @@
-var {User, UserLink} = require('./models.js');
+var {User, UserLink} = require('./models');
 
 const FAKE_USER_ID = '5f489535ba19eb2a37965fca';
 

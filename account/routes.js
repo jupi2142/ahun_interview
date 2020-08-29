@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var controllers = require('./controllers.js');
+var controllers = require('./controllers');
 
 router.get('/verify', controllers.verify);
 router.post('/logout', controllers.logout);
