@@ -2,23 +2,17 @@ var {User, UserLink} = require('./models');
 
 const FAKE_USER_ID = '5f489535ba19eb2a37965fca';
 
-module.exports.get = async function(request, response, next) {
-  try {
-    var user = await User.findById(request.params.id);
-    response.json(user);
-  } catch (e) {
-    next(e);
-  }
+module.exports.get = async function(request, response) {
+  var user = await User.findById(request.params.id);
+  response.json(user);
 };
 
-module.exports.mine = async function(request, response, next) {
-  try {
-    var userId = getLoggedInUser(request);
-    var user = await User.findById(userId);
-    response.json(user);
-  } catch (e) {
-    next(e);
-  }
+module.exports.mine = async function(request, response) {
+  // var userId = getLoggedInUser(request);
+  var userId = FAKE_USER_ID;
+  var user = await User.findById(userId);
+  console.log('user: ', user);
+  response.json(user);
 };
 
 module.exports.follow = async function(request, response) {
