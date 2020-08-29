@@ -21,7 +21,8 @@ var userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Account',
       required: true,
-      index:true,
+      index: true,
+      unique: true,
     },
     name: {
       type: String,
@@ -30,7 +31,8 @@ var userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
-      index:true,
+      index: true,
+      unique: true,
     },
     profilePic: {
       type: String,
@@ -62,6 +64,29 @@ var userLinkSchema = new mongoose.Schema(
   },
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
+
+async function updateFollowers(userLink, next) {
+  var follower = await User.findById(userLink.follower);
+  follower.following = await UserLink.countDocuments({
+    follower: userLink.follower,
+  });
+  follower.save();
+
+  var followed = await User.findById(userLink.followed);
+  followed.followers = await UserLink.countDocuments({
+    followed: userLink.followed,
+  });
+  followed.save();
+
+  next();
+}
+
+for (const hook of ['updateOne', 'deleteOne', 'findOneAndDelete']) {
+  userLinkSchema.post(hook, async function(_, next) {
+    var query = this.getQuery();
+    await updateFollowers(query, next);
+  });
+}
 
 var UserLink = mongoose.model('UserLink', userLinkSchema);
 exports.UserLink = UserLink;

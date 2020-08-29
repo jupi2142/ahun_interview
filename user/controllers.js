@@ -2,66 +2,38 @@ var {User, UserLink} = require('./models');
 
 const FAKE_USER_ID = '5f489535ba19eb2a37965fca';
 
-module.exports.get = function(request, response) {
-  var userId = request.params.id;
-  User.findOne({_id: userId})
-    .then(result => response.json(result))
-    .catch(error => response.status(500).send(error));
+module.exports.get = async function(request, response) {
+  try {
+    var user = await User.findById(request.params.id);
+    response.json(user);
+  } catch (e) {
+    console.error(e);
+    response.status(500).send(e);
+  }
 };
 
-module.exports.mine = function(request, response) {
-  var userId = getLoggedInUser(request);
-  User.findOne({_id: userId})
-    .then(result => response.json(result))
-    .catch(error => response.status(500).send(error));
+module.exports.mine = async function(request, response) {
+  try {
+    var userId = getLoggedInUser(request);
+    var user = await User.findById(userId);
+    response.json(user);
+  } catch (e) {
+    console.error(e);
+    response.status(500).send(e);
+  }
 };
 
-module.exports.follow = function(request, response) {
+module.exports.follow = async function(request, response) {
   var obj = {follower: FAKE_USER_ID, followed: request.params.id};
-  UserLink.updateOne(obj, obj, {upsert: true, setDefaultsOnInsert: true}).then(
-    async userLink => {
-      await User.findOneAndUpdate(
-        {_id: obj.follower},
-        {
-          following: await UserLink.countDocuments({
-            follower: obj.follower,
-          }),
-        },
-      );
-      await User.findOneAndUpdate(
-        {_id: obj.followed},
-        {
-          followers: await UserLink.countDocuments({
-            followed: obj.followed,
-          }),
-        },
-      );
-      response.send("You have successfully followed user.")
-    },
-  );
+  var userLink = await UserLink.updateOne(obj, obj, {
+    upsert: true,
+    setDefaultsOnInsert: true,
+  });
+  response.send('You have successfully followed user.');
 };
 
-module.exports.unfollow = function(request, response) {;
+module.exports.unfollow = async function(request, response) {
   var obj = {follower: FAKE_USER_ID, followed: request.params.id};
-  UserLink.findOneAndDelete(obj).then(
-    async userLink => {
-      await User.findOneAndUpdate(
-        {_id: obj.follower},
-        {
-          following: await UserLink.countDocuments({
-            follower: obj.follower,
-          }),
-        },
-      );
-      await User.findOneAndUpdate(
-        {_id: obj.followed},
-        {
-          followers: await UserLink.countDocuments({
-            followed: obj.followed,
-          }),
-        },
-      );
-      response.send("You have successfully unfollowed user.")
-    },
-  );
+  await UserLink.findOneAndDelete(obj);
+  response.send('You have successfully unfollowed user.');
 };
