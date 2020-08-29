@@ -56,26 +56,25 @@ module.exports.mine = async function(request, response) {
   }
 };
 
-module.exports.create = function(request, response) {
-  User.findOne({_id: FAKE_USER_ID}).then(async user => {
-    if (!user) {
-      response.status(403).send('User not found');
-    }
-    try {
-      var resources = await bucket.upload(request.file.path);
-      var url = resources[0].metadata.mediaLink;
-      request.body.user = user._id;
-      request.body.image = url;
-      var post = await Post.create(request.body);
-      var user = await User.findOne({_id: post.user});
-      post.user = user;
-      user.posts = await Post.countDocuments({user: user._id});
-      user.save();
-      response.json(post);
-    } catch (e) {
-      response.status(500).send(e);
-    }
-  });
+module.exports.create = async function(request, response) {
+  var user = await User.findOne({_id: FAKE_USER_ID});
+  if (!user) {
+    response.status(403).send('User not found');
+  }
+  try {
+    var resources = await bucket.upload(request.file.path);
+    var url = resources[0].metadata.mediaLink;
+    request.body.user = user._id;
+    request.body.image = url;
+    var post = await Post.create(request.body);
+    var user = await User.findOne({_id: post.user});
+    post.user = user;
+    user.posts = await Post.countDocuments({user: user._id});
+    user.save();
+    response.json(post);
+  } catch (e) {
+    response.status(500).send(e);
+  }
 };
 
 module.exports.like = async function(request, response) {
