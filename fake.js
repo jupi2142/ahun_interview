@@ -25,21 +25,24 @@ async function clean() {
 async function main() {
   await clean();
   for (const userIndex of lodash.range(10)) {
-    var account = await Account.create({});
+    var account = await Account.create({
+      uid: faker.internet.password(28, false),
+      phoneNumber: `+${faker.random.number(10**12)}`,
+    });
     var name = faker.name.findName();
     var username = name.replace(/\W+/g, '-').toLowerCase();
     var user = await User.create({
       account: account._id,
       name,
       username,
-      profilePic: faker.image.avatar(),
+      profilePic: 'placeholder.jpeg',  // faker.image.avatar(),
       bio: faker.lorem.paragraph(),
     });
     console.log('user._id: ', user._id);
     for (const postIndex of lodash.range(30)) {
       var post = await Post.create({
         caption: faker.lorem.paragraph(),
-        image: faker.image.imageUrl(),
+        image: 'placeholder.jpeg',  //faker.image.imageUrl(),
         user: user._id,
       });
       console.log('\tpost._id: ', post._id);
