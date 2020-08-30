@@ -1,15 +1,15 @@
 var {Storage} = require('@google-cloud/storage');
 var admin = require('firebase-admin');
 
-var serviceAccountFile = `${__dirname}/real-service-account-file.json`
+var serviceAccountFile = `${__dirname}/real-service-account-file.json`;
 
 var gcsConfig = {
-  bucket: "simple-feed-704cd.appspot.com",
-  projectId: "simple-feed-704cd",
-  acl: "publicread",
-  contentType: (_, __) => "image/jpeg",
-  keyFilename: serviceAccountFile
-}
+  bucket: 'simple-feed-704cd.appspot.com',
+  projectId: 'simple-feed-704cd',
+  acl: 'publicread',
+  contentType: (_, __) => 'image/jpeg',
+  keyFilename: serviceAccountFile,
+};
 
 /* admin.initializeApp({
   credential: serviceAccountFile,
