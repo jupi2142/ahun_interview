@@ -27,7 +27,7 @@ async function main() {
   for (const userIndex of lodash.range(10)) {
     var account = await Account.create({
       uid: faker.internet.password(28, false),
-      phoneNumber: `+${faker.random.number(10**12)}`,
+      phoneNumber: faker.phone.phoneNumber('+2519########')
     });
     var name = faker.name.findName();
     var username = name.replace(/\W+/g, '-').toLowerCase();
