@@ -5,17 +5,14 @@ var userSchema = new mongoose.Schema(
     posts: {
       type: Number,
       default: 0,
-      // required: true,
     },
     followers: {
       type: Number,
       default: 0,
-      // required: true,
     },
     following: {
       type: Number,
       default: 0,
-      // required: true,
     },
     account: {
       type: mongoose.Schema.Types.ObjectId,
@@ -26,21 +23,17 @@ var userSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
     },
     username: {
       type: String,
-      required: true,
       index: true,
       unique: true,
     },
     profilePic: {
       type: String,
-      required: true,
     },
     bio: {
       type: String,
-      // required: true,
     },
   },
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
