@@ -13,15 +13,9 @@ var app = express();
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var multer = require('multer');
+var multerGoogleStorage = require("multer-google-storage");
 var multerMiddleware = multer({
-  storage: multer.diskStorage({
-    destination: function(req, file, cb) {
-      cb(null, '/tmp');
-    },
-    filename: function(req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now());
-    },
-  }),
+  storage: multerGoogleStorage.storageEngine(),
 });
 
 var accountRoutes = require('./account/routes');

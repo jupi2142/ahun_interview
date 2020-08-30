@@ -1,6 +1,6 @@
 var {User, UserLink} = require('./models');
 
-const FAKE_USER_ID = '5f489535ba19eb2a37965fca';
+const FAKE_USER_ID = '5f4b4cbd610cc053f612a83b';
 
 module.exports.get = async function(request, response) {
   var user = await User.findById(request.params.id);

@@ -1,8 +1,7 @@
 var {Post, Like} = require('./models');
 var {User} = require('../user/models');
-var bucket = require('../bucket');
 
-const FAKE_USER_ID = '5f489535ba19eb2a37965fca';
+const FAKE_USER_ID = '5f4b4cbd610cc053f612a83b';
 
 module.exports.feed = async function(request, response) {
   var filter = /\/mine/.test(request.url) ? {user: FAKE_USER_ID} : {};
@@ -27,12 +26,10 @@ module.exports.feed = async function(request, response) {
 
 module.exports.create = async function(request, response) {
   var user = await User.findById(FAKE_USER_ID);
-  var resources = await bucket.upload(request.file.path);
-  var url = resources[0].metadata.mediaLink;
   var post = await Post.create({
     ...request.body,
     user: user._id,
-    image: url,
+    image: request.file.path,
   });
   response.status(201).json(post);
 };
