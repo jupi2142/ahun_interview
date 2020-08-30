@@ -1,6 +1,8 @@
+require('dotenv').config()
+
 var express = require('express');
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/ahun', {
+mongoose.connect(process.env.MONGO_DB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
@@ -35,4 +37,4 @@ app.use('/v1/accounts/', accountRoutes);
 app.use('/v1/users/', userRoutes);
 app.use('/v1/posts/', postRoutes);
 
-app.listen(8900);
+app.listen(process.env.PORT);
