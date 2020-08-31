@@ -1,7 +1,7 @@
-var {Post, Like} = require('./models');
-var {User} = require('../user/models');
+import {Post, Like} from './models';
+import {User} from '../user/models';
 
-module.exports.feed = async function(request, response) {
+export async function feed(request: Request, response: Response): Promise<any> {
   var filter = /\/mine/.test(request.url) ? {user: response.locals.user} : {};
   var limit = parseInt(request.query.limit) || 4;
   var page = parseInt(request.query.page) || 1;
@@ -20,9 +20,12 @@ module.exports.feed = async function(request, response) {
     pages,
     page,
   });
-};
+}
 
-module.exports.create = async function(request, response) {
+export async function create(
+  request: Request,
+  response: Response,
+): Promise<any> {
   var user = await User.findById(response.locals.user);
   var post = await Post.create({
     ...request.body,
@@ -30,9 +33,9 @@ module.exports.create = async function(request, response) {
     image: request.file.filename,
   });
   response.status(201).json(post);
-};
+}
 
-module.exports.like = async function(request, response) {
+export async function like(request: Request, response: Response): Promise<any> {
   var post = await Post.findById(request.params.id);
   if (!post) {
     return response.status(404).send('Post not found');
@@ -43,9 +46,12 @@ module.exports.like = async function(request, response) {
     setDefaultsOnInsert: true,
   });
   response.send('You have successfully liked this vibe');
-};
+}
 
-module.exports.unlike = async function(request, response) {
+export async function unlike(
+  request: Request,
+  response: Response,
+): Promise<any> {
   var post = await Post.findById(request.params.id);
   if (!post) {
     return response.status(404).send('Post not found');
@@ -55,9 +61,9 @@ module.exports.unlike = async function(request, response) {
     user: response.locals.user,
   });
   response.send('You have successfully unliked this vibe');
-};
+}
 
-module.exports.get = async function(request, response) {
+export async function get(request: Request, response: Response): Promise<any> {
   var post = await Post.findById(request.params.id).populate('user');
   response.json(post);
-};
+}

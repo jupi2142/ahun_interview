@@ -1,28 +1,39 @@
-var {User, UserLink} = require('./models');
+import {User, UserLink} from './models';
+import {Request, Response} from 'express';
 
-module.exports.get = async function(request, response) {
+export async function get(request: Request, response: Response): Promise<any> {
   var user = await User.findById(request.params.id);
   response.json(user);
-};
+}
 
-module.exports.mine = async function(request, response) {
-  // var userId = getLoggedInUser(request);
-  var user = await User.findById(request.user);
-  console.log('user: ', user);
+export async function mine(request: Request, response: Response): Promise<any> {
+  var user = await User.findById(response.locals.user);
   response.json(user);
-};
+}
 
-module.exports.follow = async function(request, response) {
-  var obj = {follower: request.user, followed: request.params.id};
+export async function follow(
+  request: Request,
+  response: Response,
+): Promise<any> {
+  var obj = {
+    follower: response.locals.user,
+    followed: request.params.id,
+  };
   var userLink = await UserLink.updateOne(obj, obj, {
     upsert: true,
     setDefaultsOnInsert: true,
   });
   response.send('You have successfully followed user.');
-};
+}
 
-module.exports.unfollow = async function(request, response) {
-  var obj = {follower: request.user, followed: request.params.id};
+export async function unfollow(
+  request: Request,
+  response: Response,
+): Promise<any> {
+  var obj = {
+    follower: response.locals.user,
+    followed: request.params.id,
+  };
   await UserLink.findOneAndDelete(obj);
   response.send('You have successfully unfollowed user.');
-};
+}

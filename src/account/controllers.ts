@@ -25,8 +25,9 @@ export async function verify(request: any, response: Response): Promise<any> {
   var account = await Account.findOne({uid: userRecord.uid});
   account = account || (await Account.create(userRecord));
 
-  var user = await User.findOne({account});
-  user = user || (await User.create({account: account._id}));
+  var contents = {account: account._id}
+  var user = await User.findOne(contents);
+  user = user || (await User.create(contents));
 
   response.json(user);
 }

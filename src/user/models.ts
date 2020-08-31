@@ -74,16 +74,20 @@ var userLinkSchema = new mongoose.Schema(
 
 async function updateFollowers(userLink: any, next: any) {
   var follower = await User.findById(userLink.follower);
-  follower.following = await UserLink.countDocuments({
-    follower: userLink.follower,
-  });
-  follower.save();
+  if(follower){
+    follower.following = await UserLink.countDocuments({
+      follower: userLink.follower,
+    });
+    follower.save();
+  }
 
   var followed = await User.findById(userLink.followed);
-  followed.followers = await UserLink.countDocuments({
-    followed: userLink.followed,
-  });
-  followed.save();
+  if(followed){
+    followed.followers = await UserLink.countDocuments({
+      followed: userLink.followed,
+    });
+    followed.save();
+  }
 
   next();
 }

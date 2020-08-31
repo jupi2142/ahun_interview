@@ -1,6 +1,12 @@
-var mongoose = require('mongoose');
+import mongoose, {Schema, Document} from 'mongoose';
 
-var accountSchema = new mongoose.Schema({
+interface IAccount extends Document {
+  uid: string;
+  phoneNumber: string;
+  disabled: boolean;
+}
+
+const accountSchema : Schema = new Schema({
   uid: {
     type: String,
     match: /^\w{28}$/,
@@ -17,11 +23,6 @@ var accountSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  /* userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    require: true,
-    ref: 'User',
-  }, */
 });
 
-export var Account = mongoose.model('Account', accountSchema);
+export const Account = mongoose.model<IAccount>('Account', accountSchema);
