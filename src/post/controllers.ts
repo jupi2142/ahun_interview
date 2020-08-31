@@ -1,5 +1,6 @@
 import {Post, Like} from './models';
 import {User} from '../user/models';
+import {Request, Response} from 'express';
 
 export async function feed(request: Request, response: Response): Promise<any> {
   var filter = /\/mine/.test(request.url) ? {user: response.locals.user} : {};
@@ -27,12 +28,14 @@ export async function create(
   response: Response,
 ): Promise<any> {
   var user = await User.findById(response.locals.user);
-  var post = await Post.create({
-    ...request.body,
-    user: user._id,
-    image: request.file.filename,
-  });
-  response.status(201).json(post);
+  if (user) {
+    var post = await Post.create({
+      ...request.body,
+      user: user._id,
+      image: request.file.filename,
+    });
+    response.status(201).json(post);
+  }
 }
 
 export async function like(request: Request, response: Response): Promise<any> {

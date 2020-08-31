@@ -37,7 +37,7 @@ const postSchema: Schema = new Schema(
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
 
-async function updatePostCount(post, next: Function) {
+async function updatePostCount(post: IPost, next: Function) {
   var user = await mongoose.model('User').findOne({_id: post.user});
   if (user) {
     user.posts = await Post.countDocuments({user: post.user});
@@ -46,7 +46,7 @@ async function updatePostCount(post, next: Function) {
   next();
 }
 
-postSchema.post('save', async function(post, next) {
+postSchema.post('save', async function(post: IPost, next) {
   updatePostCount(post, next);
 });
 postSchema.post('deleteOne', {document: true, query: false}, function(
@@ -54,10 +54,10 @@ postSchema.post('deleteOne', {document: true, query: false}, function(
 ) {
   updatePostCount(this, next);
 });
-postSchema.post('deleteOne', {document: false, query: true}, function(next) {
+postSchema.post('deleteOne', {document: false, query: true}, function(next: Function) {
   console.log('deleteOne this.getQuery(): ', this.getQuery());
 });
-postSchema.post('findOneAndDelete', function(next) {
+postSchema.post('findOneAndDelete', function(next: Function) {
   console.log('findOneAndDelete this.getQuery(): ', this.getQuery());
 });
 
@@ -87,7 +87,7 @@ const likeSchema : Schema = new Schema(
 );
 
 for (const hook of ['updateOne', 'deleteOne']) {
-  likeSchema.post(hook, async function(next) {
+  likeSchema.post(hook, async function(next: Function) {
     var query = this.getQuery();
     var post = await mongoose.model('Post').findById(query.post);
     if(post){
@@ -97,5 +97,4 @@ for (const hook of ['updateOne', 'deleteOne']) {
   });
 }
 
-var Like = mongoose.model('Like', likeSchema);
-exports.Like = Like;
+export const Like = mongoose.model<ILike>('Like', likeSchema);
