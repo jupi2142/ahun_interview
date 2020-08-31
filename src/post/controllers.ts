@@ -3,12 +3,15 @@ import {User} from '../user/models';
 import {Request, Response} from 'express';
 
 export async function feed(request: Request, response: Response): Promise<any> {
-  var filter = /\/mine/.test(request.url) ? {user: response.locals.user} : {};
-  var limit = parseInt(request.query.limit) || 4;
-  var page = parseInt(request.query.page) || 1;
-  var skip = limit * (page - 1);
-  var total = await Post.countDocuments(filter);
-  var pages = Math.ceil(total / limit);
+  const filter = (
+    /\/mine/.test(request.url)
+        ? {user: response.locals.user}
+        : {});
+  const limit: number = parseInt(<string>request.query.limit) || 4;
+  const page = parseInt(<string>request.query.page) || 1;
+  const skip = limit * (page - 1);
+  const total = await Post.countDocuments(filter);
+  const pages = Math.ceil(total / limit);
 
   var posts = await Post.find(filter)
     .populate('user')

@@ -1,14 +1,14 @@
 import mongoose, {Schema, Document} from 'mongoose';
 
 interface IUser extends Document {
-  posts: number;
-  followers: number;
-  following: number;
+  posts?: number;
+  followers?: number;
+  following?: number;
   account: string; //mongoose.Schema.Types.ObjectId;
-  name: string;
-  username: string;
-  profilePic: string;
-  bio: string;
+  name?: string;
+  username?: string;
+  profilePic?: string;
+  bio?: string;
 }
 
 interface IUserLink extends Document {
@@ -72,9 +72,9 @@ var userLinkSchema = new mongoose.Schema(
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
 
-async function updateFollowers(userLink: any, next: any) {
+async function updateFollowers(userLink: any, next: Function) {
   var follower = await User.findById(userLink.follower);
-  if(follower){
+  if (follower) {
     follower.following = await UserLink.countDocuments({
       follower: userLink.follower,
     });
@@ -82,7 +82,7 @@ async function updateFollowers(userLink: any, next: any) {
   }
 
   var followed = await User.findById(userLink.followed);
-  if(followed){
+  if (followed) {
     followed.followers = await UserLink.countDocuments({
       followed: userLink.followed,
     });
@@ -92,11 +92,13 @@ async function updateFollowers(userLink: any, next: any) {
   next();
 }
 
-for (const hook of ['updateOne', 'deleteOne', 'findOneAndDelete']) {
-  userLinkSchema.post<IUserLink>(hook, async function(_: any, next: Function) {
-    var query = this.getQuery();
-    await updateFollowers(query, next);
-  });
+async function updateFollowersForQuery(_: any, next: Function) {
+  var query = this.getQuery();
+  await updateFollowers(query, next);
 }
 
-export var UserLink = mongoose.model<IUserLink>('UserLink', userLinkSchema);
+userLinkSchema.post<IUserLink>('updateOne', updateFollowersForQuery);
+userLinkSchema.post<IUserLink>('deleteOne', updateFollowersForQuery);
+userLinkSchema.post<IUserLink>('findOneAndDelete', updateFollowersForQuery);
+
+export const UserLink = mongoose.model<IUserLink>('UserLink', userLinkSchema);

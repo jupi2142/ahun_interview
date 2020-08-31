@@ -3,7 +3,7 @@ import mongoose, {Schema, Document} from 'mongoose';
 interface IAccount extends Document {
   uid: string;
   phoneNumber: string;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 const accountSchema : Schema = new Schema({

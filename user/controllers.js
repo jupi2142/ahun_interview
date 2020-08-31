@@ -7,13 +7,13 @@ module.exports.get = async function(request, response) {
 
 module.exports.mine = async function(request, response) {
   // var userId = getLoggedInUser(request);
-  var user = await User.findById(request.user);
+  var user = await User.findById(response.locals.user);
   console.log('user: ', user);
   response.json(user);
 };
 
 module.exports.follow = async function(request, response) {
-  var obj = {follower: request.user, followed: request.params.id};
+  var obj = {follower: response.locals.user, followed: request.params.id};
   var userLink = await UserLink.updateOne(obj, obj, {
     upsert: true,
     setDefaultsOnInsert: true,
@@ -22,7 +22,7 @@ module.exports.follow = async function(request, response) {
 };
 
 module.exports.unfollow = async function(request, response) {
-  var obj = {follower: request.user, followed: request.params.id};
+  var obj = {follower: response.locals.user, followed: request.params.id};
   await UserLink.findOneAndDelete(obj);
   response.send('You have successfully unfollowed user.');
 };

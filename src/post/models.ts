@@ -1,11 +1,11 @@
 import mongoose, {Schema, Document} from 'mongoose';
 
 interface IPost extends Document {
-  likes: number;
+  likes?: number;
   caption: string;
   image: string;
   user: string; // Schema.Types.ObjectId,
-  isLiked: boolean;
+  isLiked?: boolean;
 }
 
 const postSchema: Schema = new Schema(
@@ -86,15 +86,15 @@ const likeSchema : Schema = new Schema(
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
 
-for (const hook of ['updateOne', 'deleteOne']) {
-  likeSchema.post(hook, async function(next: Function) {
-    var query = this.getQuery();
-    var post = await mongoose.model('Post').findById(query.post);
-    if(post){
-      post.likes = await Like.countDocuments({post: post._id});
-      await post.save();
-    }
-  });
+async function updateLikesMiddleware(next: Function): Promise<any> {
+  var query = this.getQuery();
+  var post = await mongoose.model('Post').findById(query.post);
+  if(post){
+    post.likes = await Like.countDocuments({post: post._id});
+    await post.save();
+  }
 }
+likeSchema.post('updateOne', updateLikesMiddleware)
+likeSchema.post('deleteOne', updateLikesMiddleware)
 
 export const Like = mongoose.model<ILike>('Like', likeSchema);

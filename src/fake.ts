@@ -1,33 +1,34 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-var lodash = require('lodash');
-var faker = require('faker');
+import lodash from 'lodash';
+import faker from 'faker';
 
-var mongoose = require('mongoose');
-mongoose.connect(process.env.MONGO_DB_URL, {
+import {Account} from './account/models';
+import {User, UserLink} from './user/models';
+import {Post, Like} from './post/models';
+
+import mongoose from 'mongoose';
+mongoose.connect(`${process.env.MONGO_DB_URL}`, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
   useCreateIndex: true,
 });
 
-var {Account} = require('./account/models');
-var {User, UserLink} = require('./user/models');
-var {Post, Like} = require('./post/models');
-
-async function clean() {
+export async function clean() {
   await User.deleteMany({});
   await Post.deleteMany({});
   await Like.deleteMany({});
   await UserLink.deleteMany({});
 }
 
-async function main() {
+export async function main() {
   await clean();
   for (const userIndex of lodash.range(10)) {
     var account = await Account.create({
       uid: faker.internet.password(28, false),
-      phoneNumber: faker.phone.phoneNumber('+2519########')
+      phoneNumber: faker.phone.phoneNumber('+2519########'),
     });
     var name = faker.name.findName();
     var username = name.replace(/\W+/g, '-').toLowerCase();
@@ -35,14 +36,14 @@ async function main() {
       account: account._id,
       name,
       username,
-      profilePic: 'placeholder.jpeg',  // faker.image.avatar(),
+      profilePic: 'placeholder.jpeg', // faker.image.avatar(),
       bio: faker.lorem.paragraph(),
     });
     console.log('user._id: ', user._id);
     for (const postIndex of lodash.range(30)) {
       var post = await Post.create({
         caption: faker.lorem.paragraph(),
-        image: 'placeholder.jpeg',  //faker.image.imageUrl(),
+        image: 'placeholder.jpeg', //faker.image.imageUrl(),
         user: user._id,
       });
       console.log('\tpost._id: ', post._id);
@@ -70,11 +71,14 @@ async function main() {
   for (const user of users) {
     for (const post of posts) {
       if (lodash.sample([true, false, false])) {
-        var obj = {post: post._id, user: user._id};
-        var like = await Like.updateOne(obj, obj, {
-          upsert: true,
-          setDefaultsOnInsert: true,
-        });
+        var like = await Like.updateOne(
+          {post: post._id, user: user._id},
+          {post: post._id, user: user._id},
+          {
+            upsert: true,
+            setDefaultsOnInsert: true,
+          },
+        );
         console.log('like: ', like);
       }
     }
@@ -82,6 +86,3 @@ async function main() {
 
   console.log('FINISHED');
 }
-
-exports.main = main;
-exports.clean = clean;
