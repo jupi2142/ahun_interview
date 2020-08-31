@@ -19,7 +19,6 @@ var userSchema = new mongoose.Schema(
       ref: 'Account',
       required: true,
       index: true,
-      unique: true,
     },
     name: {
       type: String,
