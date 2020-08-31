@@ -4,7 +4,8 @@
   "description": "Backend for the simple-feed app",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/app.js",
+    "startTS": "node dist/app.js",
+    "start": "node index.js",
     "dev": "nodemon src/app.ts",
     "build": "tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
