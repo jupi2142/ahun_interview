@@ -1,9 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-const asyncHandler = require('express-async-handler')
+const asyncHandler = require('express-async-handler');
 
 var controllers = require('./controllers');
+var firebaseMiddleware = require('express-firebase-middleware');
+
+router.use('/', firebaseMiddleware.auth);
 
 router.get(['/', '/mine/'], asyncHandler(controllers.feed));
 router.get('/:id', asyncHandler(controllers.get));

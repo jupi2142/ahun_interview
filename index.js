@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 
 var express = require('express');
 var mongoose = require('mongoose');
@@ -13,7 +13,7 @@ var app = express();
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var multer = require('multer');
-var multerGoogleStorage = require("multer-google-storage");
+var multerGoogleStorage = require('multer-google-storage');
 var multerMiddleware = multer({
   storage: multerGoogleStorage.storageEngine(),
 });
