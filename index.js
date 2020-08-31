@@ -2,12 +2,15 @@ require('dotenv').config();
 
 var express = require('express');
 var mongoose = require('mongoose');
-mongoose.connect(process.env.MONGO_DB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true,
-});
+mongoose
+  .connect(process.env.MONGO_DB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  })
+  .then(_ => console.log('Mongo connected'))
+  .catch(console.error);
 
 var app = express();
 var cors = require('cors');
