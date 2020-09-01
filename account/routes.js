@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var firebaseMiddleware = require('express-firebase-middleware');
+var firebaseMiddleware = require('./middlewares.js');
 const asyncHandler = require('express-async-handler');
 
 var controllers = require('./controllers');

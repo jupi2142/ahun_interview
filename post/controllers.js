@@ -23,10 +23,9 @@ module.exports.feed = async function(request, response) {
 };
 
 module.exports.create = async function(request, response) {
-  var user = await User.findById(response.locals.user);
   var post = await Post.create({
     ...request.body,
-    user: user._id,
+    user: response.locals.user._id,
     image: request.file.filename,
   });
   response.status(201).json(post);

@@ -86,7 +86,7 @@ const likeSchema : Schema = new Schema(
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
 
-async function updateLikesMiddleware(next: Function): Promise<any> {
+async function updateLikesMiddleware(_: any, next: Function, done: Function): Promise<any> {
   var query = this.getQuery();
   var post = await mongoose.model('Post').findById(query.post);
   if(post){

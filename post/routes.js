@@ -4,7 +4,7 @@ var router = express.Router();
 const asyncHandler = require('express-async-handler');
 
 var controllers = require('./controllers');
-var firebaseMiddleware = require('express-firebase-middleware');
+var firebaseMiddleware = require('../account/middlewares.js');
 
 router.use('/', firebaseMiddleware.auth);
 
