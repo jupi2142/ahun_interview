@@ -3,7 +3,11 @@ dotenv.config();
 import admin from 'firebase-admin';
 import {Request, Response} from 'express';
 import {User} from '../user/models';
-import {Account} from './models';
+import {
+  Account,
+  getOrCreateFromUserRecord,
+  getOrCreateUserForAccount,
+} from './models';
 
 const serviceAccount = require(`${process.env.GCS_KEYFILE}`);
 
@@ -22,12 +26,8 @@ export async function verify(request: any, response: Response): Promise<any> {
     return response.status(401).send('Phone number has not been verified');
   }
 
-  var account = await Account.findOne({uid: userRecord.uid});
-  account = account || (await Account.create(userRecord));
-
-  var contents = {account: account._id}
-  var user = await User.findOne(contents);
-  user = user || (await User.create(contents));
+  var account = await getOrCreateFromUserRecord(userRecord);
+  var user = await getOrCreateUserForAccount(account);
 
   response.json(user);
 }

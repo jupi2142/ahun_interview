@@ -4,9 +4,9 @@
   "description": "Backend for the simple-feed app",
   "main": "index.js",
   "scripts": {
-    "startTS": "node dist/app.js",
-    "start": "node index.js",
+    "start": "node dist/app.js",
     "dev": "nodemon src/app.ts",
+    "build": "tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Henock Tesfaye",

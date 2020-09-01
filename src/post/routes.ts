@@ -2,7 +2,7 @@ import {Router} from 'express';
 import asyncHandler from 'express-async-handler';
 import * as controllers from './controllers';
 
-var firebaseMiddleware = require('express-firebase-middleware');
+import * as firebaseMiddleware from '../account/middlewares';
 
 const router = Router();
 
