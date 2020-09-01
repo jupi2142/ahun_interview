@@ -71,14 +71,5 @@ var likeSchema = new mongoose.Schema(
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
 
-for (const hook of ['updateOne', 'deleteOne']) {
-  likeSchema.post(hook, async function(next) {
-    var query = this.getQuery();
-    var post = await mongoose.model('Post').findById(query.post);
-    post.likes = await Like.countDocuments({post: post._id});
-    await post.save();
-  });
-}
-
 var Like = mongoose.model('Like', likeSchema);
 exports.Like = Like;

@@ -36,11 +36,7 @@ module.exports.like = async function(request, response) {
   if (!post) {
     return response.status(404).send('Post not found');
   }
-  var obj = {post: request.params.id, user: response.locals.user};
-  var like = await Like.updateOne(obj, obj, {
-    upsert: true,
-    setDefaultsOnInsert: true,
-  });
+  response.locals.user.like(post)
   response.send('You have successfully liked this vibe');
 };
 
@@ -49,10 +45,7 @@ module.exports.unlike = async function(request, response) {
   if (!post) {
     return response.status(404).send('Post not found');
   }
-  await Like.deleteOne({
-    post: request.params.id,
-    user: response.locals.user,
-  });
+  response.locals.user.unlike(post)
   response.send('You have successfully unliked this vibe');
 };
 

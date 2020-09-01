@@ -1,6 +1,6 @@
 import mongoose, {Schema, Document} from 'mongoose';
 
-interface IPost extends Document {
+export interface IPost extends Document {
   likes?: number;
   caption: string;
   image: string;
@@ -37,30 +37,6 @@ const postSchema: Schema = new Schema(
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
 
-async function updatePostCount(post: IPost, next: Function) {
-  var user = await mongoose.model('User').findOne({_id: post.user});
-  if (user) {
-    user.posts = await Post.countDocuments({user: post.user});
-    user.save();
-  }
-  next();
-}
-
-postSchema.post('save', async function(post: IPost, next) {
-  updatePostCount(post, next);
-});
-postSchema.post('deleteOne', {document: true, query: false}, function(
-  next: Function,
-) {
-  updatePostCount(this, next);
-});
-postSchema.post('deleteOne', {document: false, query: true}, function(next: Function) {
-  console.log('deleteOne this.getQuery(): ', this.getQuery());
-});
-postSchema.post('findOneAndDelete', function(next: Function) {
-  console.log('findOneAndDelete this.getQuery(): ', this.getQuery());
-});
-
 export const Post = mongoose.model<IPost>('Post', postSchema);
 
 interface ILike extends Document {
@@ -85,16 +61,5 @@ const likeSchema : Schema = new Schema(
   },
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
-
-async function updateLikesMiddleware(_: any, next: Function, done: Function): Promise<any> {
-  var query = this.getQuery();
-  var post = await mongoose.model('Post').findById(query.post);
-  if(post){
-    post.likes = await Like.countDocuments({post: post._id});
-    await post.save();
-  }
-}
-likeSchema.post('updateOne', updateLikesMiddleware)
-likeSchema.post('deleteOne', updateLikesMiddleware)
 
 export const Like = mongoose.model<ILike>('Like', likeSchema);

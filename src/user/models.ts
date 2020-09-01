@@ -1,4 +1,5 @@
 import mongoose, {Schema, Document} from 'mongoose';
+import {IPost} from '../post/models';
 
 interface IUser extends Document {
   posts?: number;
@@ -54,6 +55,62 @@ const userSchema: Schema = new Schema(
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
 
+userSchema.methods.follow = async function(user: IUser) {
+  var userLinkData = {follower: this._id, followed: user._id};
+  var userLink = await UserLink.findOne(userLinkData);
+  if (userLink == null) {
+    userLink = await UserLink.create(userLinkData);
+    this.following += 1;
+    this.save();
+
+    if (user.followers == undefined) {
+      user.followers = 0;
+    }
+    user.followers += 1;
+    user.save();
+  }
+};
+
+userSchema.methods.unfollow = async function(user: IUser) {
+  var userLinkData = {follower: this._id, followed: user._id};
+  var results = await UserLink.deleteOne(userLinkData);
+  if (results.n != 0) {
+    this.following -= 1;
+    this.save();
+
+    if (user.followers == undefined) {
+      user.followers = 0;
+    }
+    user.followers -= 1;
+    user.save();
+  }
+};
+
+userSchema.methods.like = async function(post: IPost) {
+  var likeData = {post: post._id, user: this._id};
+  var like = await this.model('Like').findOne(likeData);
+  if (like == null) {
+    like = await this.model('Like').create(likeData);
+    if (post.likes == undefined) {
+      post.likes = 0;
+    }
+    post.likes += 1;
+    post.save();
+  }
+};
+
+userSchema.methods.unlike = async function(post: IPost) {
+  var likeData = {post: post._id, user: this._id};
+  var results = await this.model('Like').deleteOne(likeData);
+  if (results.n != 0) {
+    if (post.likes == undefined) {
+      post.likes = 0;
+    }
+    post.likes -= 1;
+    post.save();
+  }
+};
+
 export const User = mongoose.model<IUser>('User', userSchema);
 
 var userLinkSchema = new mongoose.Schema(
@@ -71,34 +128,5 @@ var userLinkSchema = new mongoose.Schema(
   },
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
-
-async function updateFollowers(userLink: any, next: Function) {
-  var follower = await User.findById(userLink.follower);
-  if (follower) {
-    follower.following = await UserLink.countDocuments({
-      follower: userLink.follower,
-    });
-    follower.save();
-  }
-
-  var followed = await User.findById(userLink.followed);
-  if (followed) {
-    followed.followers = await UserLink.countDocuments({
-      followed: userLink.followed,
-    });
-    followed.save();
-  }
-
-  next();
-}
-
-async function updateFollowersForQuery(_: any, next: Function) {
-  var query = this.getQuery();
-  await updateFollowers(query, next);
-}
-
-userLinkSchema.post<IUserLink>('updateOne', updateFollowersForQuery);
-userLinkSchema.post<IUserLink>('deleteOne', updateFollowersForQuery);
-userLinkSchema.post<IUserLink>('findOneAndDelete', updateFollowersForQuery);
 
 export const UserLink = mongoose.model<IUserLink>('UserLink', userLinkSchema);

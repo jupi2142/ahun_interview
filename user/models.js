@@ -38,8 +38,53 @@ var userSchema = new mongoose.Schema(
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
 
+userSchema.methods.follow = async function(user) {
+  var userLinkData = {follower: this._id, followed: user._id}
+  var userLink = await UserLink.findOne(userLinkData);
+  if(userLink == null){
+    userLink = await UserLink.create(userLinkData)
+    this.following += 1;
+    this.save();
+
+    user.followers += 1;
+    user.save()
+  }
+}
+
+userSchema.methods.unfollow = async function(user) {
+  var userLinkData = {follower: this._id, followed: user._id}
+  var results = await UserLink.deleteOne(userLinkData);
+  if(results.n != 0){
+    this.following -= 1;
+    this.save();
+
+    user.followers -= 1;
+    user.save()
+  }
+}
+
+userSchema.methods.like = async function(post) {
+  var likeData = {post: post._id, user: this._id};
+  var like = await this.model('Like').findOne(likeData);
+  if(like == null){
+    like = await Like.create(likeData)
+    post.likes += 1;
+    post.save()
+  }
+}
+
+userSchema.methods.unlike = async function(post) {
+  var likeData = {post: post._id, user: this._id};
+  var results = await this.model('Like').deleteOne(likeData);
+  if(results.n != 0){
+    post.likes -= 1;
+    post.save()
+  }
+}
+
 var User = mongoose.model('User', userSchema);
 exports.User = User;
+
 
 var userLinkSchema = new mongoose.Schema(
   {
@@ -56,29 +101,6 @@ var userLinkSchema = new mongoose.Schema(
   },
   {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}},
 );
-
-async function updateFollowers(userLink, next) {
-  var follower = await User.findById(userLink.follower);
-  follower.following = await UserLink.countDocuments({
-    follower: userLink.follower,
-  });
-  follower.save();
-
-  var followed = await User.findById(userLink.followed);
-  followed.followers = await UserLink.countDocuments({
-    followed: userLink.followed,
-  });
-  followed.save();
-
-  next();
-}
-
-for (const hook of ['updateOne', 'deleteOne', 'findOneAndDelete']) {
-  userLinkSchema.post(hook, async function(_, next) {
-    var query = this.getQuery();
-    await updateFollowers(query, next);
-  });
-}
 
 var UserLink = mongoose.model('UserLink', userLinkSchema);
 exports.UserLink = UserLink;

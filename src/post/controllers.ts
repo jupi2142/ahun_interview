@@ -37,6 +37,8 @@ export async function create(
       user: user._id,
       image: request.file.filename,
     });
+    user.posts = (user.posts || 0) + 1;
+    user.save()
     response.status(201).json(post);
   }
 }
