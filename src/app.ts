@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import multer from 'multer';
-import MulterGoogleStorage from 'multer-google-storage';
 import accountRoutes from './account/routes';
 import userRoutes from './user/routes';
 import postRoutes from './post/routes';
@@ -20,12 +19,11 @@ mongoose
   .then(_ => console.log('Mongo connected'))
   .catch(console.error);
 
+import MulterGoogleStorage = require('multer-google-storage');
 const app: Application = express();
-/* const multerMiddleware = multer({
+const multerMiddleware = multer({
   storage: MulterGoogleStorage.storageEngine(),
 });
-*/
-const multerMiddleware = multer({dest: './public/images'});
 
 app.use(cors({origin: true}));
 app.use(multerMiddleware.single('file'));
